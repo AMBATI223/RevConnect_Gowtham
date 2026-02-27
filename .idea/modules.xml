@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/revconnect.iml" filepath="$PROJECT_DIR$/.idea/revconnect.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/rev-du.iml" filepath="$PROJECT_DIR$/.idea/rev-du.iml" />
+      <module fileurl="file://$PROJECT_DIR$/revconnect/revconnect.iml" filepath="$PROJECT_DIR$/revconnect/revconnect.iml" />
     </modules>
   </component>
 </project>
