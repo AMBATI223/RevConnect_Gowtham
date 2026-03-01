@@ -5,16 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cd006b96-5ba0-4566-b781-1a63203e499c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/revconnect.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vscode/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/.vscode/settings.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/revconnect" beforeDir="false" afterPath="$PROJECT_DIR$/revconnect" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/revconnect/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/revconnect/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/revconnect/app-run-utf8.log" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/revconnect/app-run.log" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/revconnect/app.log" beforeDir="false" />
@@ -50,6 +42,7 @@
       <change beforePath="$PROJECT_DIR$/revconnect/compile_verbose_utf8.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/revconnect/errors.log" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/revconnect/src/main/java/com/revconnect/app/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/revconnect/src/main/java/com/revconnect/app/config/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/revconnect/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/revconnect/src/main/resources/application.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/revconnect/startup.log" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/revconnect/startup2.log" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/revconnect/startup_log.txt" beforeDir="false" />
@@ -101,6 +94,7 @@
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
     "last_opened_file_path": "C:/Users/Ambati/Desktop/rev-du",
     "project.structure.last.edited": "Project",

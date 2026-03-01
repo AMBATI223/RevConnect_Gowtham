@@ -1,0 +1,78 @@
+On branch main
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	deleted:    uploads/0903db93-394a-4015-a05b-cc47d64f63f5.png
+	deleted:    uploads/1ea3de20-ab9d-4d5e-81ce-c582e3fd6a62.jpg
+	deleted:    uploads/1f049ad5-2454-4bac-8f30-ebe758af78c7.png
+	deleted:    uploads/20af2bf8-7d01-4efc-9d2d-d5dbc18c43ba.png
+	deleted:    uploads/27dca209-900c-465a-87bc-8a7c70f3175c.png
+	deleted:    uploads/4333fcc6-848f-4b3f-b11d-0215c6f13fd8.png
+	deleted:    uploads/5420216d-6f7c-4638-85e0-e1758cff066b.webp
+	deleted:    uploads/62afeb3f-6444-4096-98c7-5c451f045762.png
+	deleted:    uploads/6a33b3de-bfd1-4f04-8162-29be2ec2dfc7.png
+	deleted:    uploads/6eb6085e-72f1-444c-b73c-c6d29d549efa.png
+	deleted:    uploads/70935e79-985e-4510-a323-97ccd2e04d16.png
+	deleted:    uploads/7462a8c0-a929-4cab-bc55-bfdde452bcd4.png
+	deleted:    uploads/8715bea3-97fd-4247-98fa-cb76e9fa3721.jpeg
+	deleted:    uploads/88eb1d99-b30d-4d6a-bdb0-ab3e85477a63.jpg
+	deleted:    uploads/89228de6-9dbd-4b77-b4e2-d86e1576a25e.png
+	deleted:    uploads/901da711-e303-4d27-9072-1e0fa3e2727d.png
+	deleted:    uploads/c1f473ba-badd-4002-813f-cc5cc8d15507.avif
+	deleted:    uploads/f270a230-0564-4d7b-b122-00675324e330.jpeg
+	deleted:    uploads/f9eb2564-35bc-4630-8f6d-506948710afd.png
+	deleted:    uploads/stories/339edda8-3ccb-40cf-8e6f-35676f4ca8c4_Birla.png
+	deleted:    uploads/stories/45f64ea7-b2ee-4a44-9551-e390a75991c2_film.png
+	deleted:    uploads/stories/49d92b21-907c-48d1-945e-aeddc3a4f846_Birla.png
+	deleted:    uploads/stories/5c5210c4-fa34-4d93-9f3e-b9c235b52311_image (2).png
+	deleted:    uploads/stories/c9631061-f99e-418b-8971-8baea15b6166_film.png
+	deleted:    uploads/stories/e6b9c175-e23d-45cf-902e-17ccca513dea_Birla.png
+
+Changes not staged for commit:
+  (use "git add/rm <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   .gitignore
+	deleted:    app-run-utf8.log
+	deleted:    app-run.log
+	deleted:    app.log
+	deleted:    app8.log
+	deleted:    app8_retry.log
+	deleted:    app8_retry2.log
+	deleted:    boot-run.log
+	deleted:    boot-run2.log
+	deleted:    boot-run3.log
+	deleted:    boot-run4.log
+	deleted:    boot-run5.log
+	deleted:    boot-run6.log
+	deleted:    boot-run7.log
+	deleted:    boot-run8.log
+	deleted:    clean_startup.log
+	deleted:    compile8.log
+	deleted:    compile_b.txt
+	deleted:    compile_clean_batch.txt
+	deleted:    compile_errors.log
+	deleted:    compile_errors.txt
+	deleted:    compile_errors2.log
+	deleted:    compile_errors_after_fix.txt
+	deleted:    compile_errors_after_fix_utf8.txt
+	deleted:    compile_errors_clean.txt
+	deleted:    compile_errors_utf8.log
+	deleted:    compile_errors_utf8.txt
+	deleted:    compile_fresh.txt
+	deleted:    compile_out.log
+	deleted:    compile_out.txt
+	deleted:    compile_out_utf8.txt
+	deleted:    compile_output.txt
+	deleted:    compile_verbose.txt
+	deleted:    compile_verbose_utf8.txt
+	deleted:    errors.log
+	modified:   src/main/java/com/revconnect/app/config/SecurityConfig.java
+	modified:   src/main/resources/application.properties
+	deleted:    startup.log
+	deleted:    startup2.log
+	deleted:    startup_log.txt
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	src/main/java/com/revconnect/app/mapper/
+	src/main/resources/templates/
+

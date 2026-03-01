@@ -1,0 +1,13 @@
+diff --git a/src/main/java/com/revconnect/app/config/SecurityConfig.java b/src/main/java/com/revconnect/app/config/SecurityConfig.java
+index a02a2ad..f49011a 100644
+--- a/src/main/java/com/revconnect/app/config/SecurityConfig.java
++++ b/src/main/java/com/revconnect/app/config/SecurityConfig.java
+@@ -46,7 +46,7 @@ public class SecurityConfig {
+                         .anyRequest().authenticated())
+                 .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()))
+                 .formLogin(form -> form
+-                        .loginPage("/login").defaultSuccessUrl("/", true).permitAll())
++                        .loginPage("/login").defaultSuccessUrl("/login?loggedin", true).permitAll())
+                 .logout(logout -> logout
+                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout")).logoutSuccessUrl("/login?logout")
+                         .permitAll())
