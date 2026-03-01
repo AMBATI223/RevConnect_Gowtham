@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>RevConnect - Analytics Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" th:href="@{/css/style.css(v=${#dates.format(#dates.createNow(),'yyyyMMddHHmmss')})}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="bg-light">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-white bg-white shadow-sm sticky-top py-2">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand text-primary fw-bold fs-4" th:href="@{/}">RevConnect</a>
+            <!-- Home Icon with Text -->
+            <div class="ms-3 d-none d-lg-block">
+                <a class="nav-link d-flex align-items-center" th:href="@{/}">
+                    <i class="bi bi-house-door fs-5 me-1"></i>
+                    <span class="fw-bold">Home</span>
+                </a>
+            </div>
+
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item px-2">
+                        <a class="nav-link" th:href="@{/users/search}" title="Search">
+                            <i class="bi bi-search fs-5"></i><span class="d-lg-none ms-2">Search</span>
+                        </a>
+                    </li>
+                    <li class="nav-item px-2">
+                        <a class="nav-link" th:href="@{/network/following}" title="Network">
+                            <i class="bi bi-people fs-5"></i><span class="d-lg-none ms-2">Network</span>
+                        </a>
+                    </li>
+                    <li class="nav-item px-2">
+                        <a class="nav-link position-relative" th:href="@{/messages}" title="Messages">
+                            <i class="bi bi-chat-dots fs-5"></i>
+                            <span th:if="${unreadMessageCount > 0}"
+                                class="position-absolute top-1 start-100 translate-middle badge rounded-pill bg-danger"
+                                style="font-size: 0.6rem; padding: 0.25em 0.45em;"
+                                th:text="${unreadMessageCount}">0</span>
+                            <span class="d-lg-none ms-2">Messages</span>
+                        </a>
+                    </li>
+                    <li class="nav-item px-2">
+                        <a class="nav-link position-relative" th:href="@{/notifications}" title="Notifications">
+                            <i class="bi bi-bell fs-5"></i>
+                            <span th:if="${unreadNotificationCount > 0}"
+                                class="position-absolute top-1 start-100 translate-middle badge rounded-pill bg-danger"
+                                style="font-size: 0.6rem; padding: 0.25em 0.45em;"
+                                th:text="${unreadNotificationCount}">0</span>
+                            <span class="d-lg-none ms-2">Notifications</span>
+                        </a>
+                    </li>
+                    <li class="nav-item px-2">
+                        <a class="nav-link active" th:href="@{/analytics}" title="Analytics">
+                            <i class="bi bi-graph-up-arrow fs-5 text-primary"></i><span
+                                class="d-lg-none ms-2">Analytics</span>
+                        </a>
+                    </li>
+                    <li class="nav-item px-2">
+                        <a class="nav-link d-flex align-items-center" th:href="@{/users}">
+                            <img th:src="${currentUser != null and currentUser.profilePictureUrl != null ? currentUser.profilePictureUrl : 'https://via.placeholder.com/32'}"
+                                class="rounded-circle border" style="width: 32px; height: 32px; object-fit: cover;">
+                            <span class="ms-2 d-lg-none"
+                                th:text="${currentUser != null ? currentUser.username : 'My Profile'}">Profile</span>
+                        </a>
+                    </li>
+                    <li class="nav-item ms-lg-3">
+                        <a class="btn btn-outline-danger btn-sm rounded-pill px-3" th:href="@{/logout}">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <div>
+                <h2 class="fw-bold mb-1">Performance Overview</h2>
+                <p class="text-muted">Analyze your reach and engagement metrics</p>
+            </div>
+            <button class="btn btn-primary rounded-pill px-4 shadow-sm" onclick="window.print()">
+                <i class="bi bi-download me-2"></i>Export PDF
+            </button>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-md-3">
+                <div class="card analytics-card shadow-sm border-0 p-3 h-100">
+                    <div class="icon-box bg-primary bg-opacity-10 text-primary">
+                        <i class="bi bi-eye-fill fs-4"></i>
+                    </div>
+                    <h6 class="text-muted text-uppercase small fw-bold">Total Reach</h6>
+                    <h2 class="fw-bold mb-0" th:text="${totalViews}">0</h2>
+                    <small class="text-success mt-2 d-block"><i class="bi bi-arrow-up"></i> 12% from last month</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card analytics-card shadow-sm border-0 p-3 h-100">
+                    <div class="icon-box bg-success bg-opacity-10 text-success">
+                        <i class="bi bi-heart-fill fs-4"></i>
+                    </div>
+                    <h6 class="text-muted text-uppercase small fw-bold">Engagement</h6>
+                    <h2 class="fw-bold mb-0" th:text="${totalEngagement}">0</h2>
+                    <small class="text-success mt-2 d-block"><i class="bi bi-arrow-up"></i> 5% from last month</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card analytics-card shadow-sm border-0 p-3 h-100">
+                    <div class="icon-box bg-info bg-opacity-10 text-info">
+                        <i class="bi bi-people-fill fs-4"></i>
+                    </div>
+                    <h6 class="text-muted text-uppercase small fw-bold">Followers</h6>
+                    <h2 class="fw-bold mb-0" th:text="${totalFollowers}">0</h2>
+                    <small class="text-success mt-2 d-block"><i class="bi bi-plus-lg"></i> New followers</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card analytics-card shadow-sm border-0 p-3 h-100">
+                    <div class="icon-box bg-warning bg-opacity-10 text-warning">
+                        <i class="bi bi-file-post-fill fs-4"></i>
+                    </div>
+                    <h6 class="text-muted text-uppercase small fw-bold">Posts</h6>
+                    <h2 class="fw-bold mb-0" th:text="${posts.size()}">0</h2>
+                    <small class="text-muted mt-2 d-block">Published to date</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+            <div class="card-header bg-white py-3 border-0">
+                <h5 class="fw-bold mb-0">Post Performance Details</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">Date</th>
+                            <th>Content Snippet</th>
+                            <th class="text-center">Reach</th>
+                            <th class="text-center">Likes</th>
+                            <th class="text-center">Comments</th>
+                            <th class="text-center pe-4">Engagement Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="post : ${posts}">
+                            <td class="ps-4" th:text="${#temporals.format(post.createdAt, 'MMM dd, yyyy')}">Date</td>
+                            <td class="text-truncate" style="max-width: 300px;" th:text="${post.content}">Content</td>
+                            <td class="text-center fw-bold" th:text="${postViews.get(post.id)}">0</td>
+                            <td class="text-center" th:text="${post.likesCount}">0</td>
+                            <td class="text-center" th:text="${post.commentsCount}">0</td>
+                            <td class="text-center pe-4">
+                                <span class="badge rounded-pill bg-success bg-opacity-10 text-success px-3"
+                                    th:text="${postViews.get(post.id) > 0 ? ((post.likesCount + post.commentsCount) * 100 / postViews.get(post.id)) + '%' : '0%'}">
+                                    0%</span>
+                            </td>
+                        </tr>
+                        <tr th:if="${posts == null or posts.empty}">
+                            <td colspan="6" class="text-center text-muted py-5">
+                                <i class="bi bi-bar-chart display-4 mb-3 d-block opacity-25"></i>
+                                No post data available yet.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

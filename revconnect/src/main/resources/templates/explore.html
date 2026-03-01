@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>RevConnect - Explore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" th:href="@{/css/style.css(v=${#dates.format(#dates.createNow(),'yyyyMMddHHmmss')})}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-white bg-white shadow-sm sticky-top py-2">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand text-primary fw-bold fs-4" th:href="@{/}">RevConnect</a>
+            <!-- Home Icon with Text -->
+            <div class="ms-3 d-none d-lg-block">
+                <a class="nav-link d-flex align-items-center" th:href="@{/}">
+                    <i class="bi bi-house-door fs-5 me-1"></i>
+                    <span class="fw-bold">Home</span>
+                </a>
+            </div>
+
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item px-2">
+                        <a class="nav-link" th:href="@{/users/search}" title="Search">
+                            <i class="bi bi-search fs-5"></i><span class="d-lg-none ms-2">Search</span>
+                        </a>
+                    </li>
+                    <li class="nav-item px-2">
+                        <a class="nav-link" th:href="@{/network/following}" title="Network">
+                            <i class="bi bi-people fs-5"></i><span class="d-lg-none ms-2">Network</span>
+                        </a>
+                    </li>
+                    <li class="nav-item px-2">
+                        <a class="nav-link position-relative" th:href="@{/messages}" title="Messages">
+                            <i class="bi bi-chat-dots fs-5"></i>
+                            <span th:if="${unreadMessageCount > 0}"
+                                class="position-absolute top-1 start-100 translate-middle badge rounded-pill bg-danger"
+                                style="font-size: 0.6rem; padding: 0.25em 0.45em;"
+                                th:text="${unreadMessageCount}">0</span>
+                            <span class="d-lg-none ms-2">Messages</span>
+                        </a>
+                    </li>
+                    <li class="nav-item px-2">
+                        <a class="nav-link position-relative" th:href="@{/notifications}" title="Notifications">
+                            <i class="bi bi-bell fs-5"></i>
+                            <span th:if="${unreadNotificationCount > 0}"
+                                class="position-absolute top-1 start-100 translate-middle badge rounded-pill bg-danger"
+                                style="font-size: 0.6rem; padding: 0.25em 0.45em;"
+                                th:text="${unreadNotificationCount}">0</span>
+                            <span class="d-lg-none ms-2">Notifications</span>
+                        </a>
+                    </li>
+                    <li class="nav-item px-2">
+                        <a class="nav-link d-flex align-items-center" th:href="@{/users}">
+                            <img th:src="${currentUser != null and currentUser.profilePictureUrl != null ? currentUser.profilePictureUrl : 'https://via.placeholder.com/32'}"
+                                class="rounded-circle border" style="width: 32px; height: 32px; object-fit: cover;">
+                            <span class="ms-2 d-lg-none"
+                                th:text="${currentUser != null ? currentUser.username : 'My Profile'}">Profile</span>
+                        </a>
+                    </li>
+                    <li class="nav-item ms-lg-3">
+                        <a class="btn btn-outline-danger btn-sm rounded-pill px-3" th:href="@{/logout}">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="max-width: 1200px; margin-top: 20px;">
+        <h2 style="margin-bottom: 5px;">Explore</h2>
+        <p style="color: gray; margin-top: 0;">Discover new content from people outside your network</p>
+
+        <!-- Trending Tags Strip -->
+        <div style="margin: 20px 0; display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px;">
+            <a th:each="tag : ${trendingHashtags}" th:href="@{/posts/hashtag(tag=${tag})}"
+                style="background: white; border: 1px solid var(--primary-color); color: var(--primary-color); padding: 8px 15px; border-radius: 20px; text-decoration: none; white-space: nowrap; font-weight: bold;">
+                <span th:text="${tag}">#hashtag</span>
+            </a>
+        </div>
+
+        <div th:if="${posts == null or posts.empty}" style="text-align: center; color: gray; padding: 50px;">
+            <div style="font-size: 3em; margin-bottom: 20px;">🔍</div>
+            <p>No new content to explore right now. Try searching for users or hashtags.</p>
+        </div>
+
+        <div class="grid-container" th:if="${posts != null and !posts.empty}">
+            <div th:each="post : ${posts}" class="grid-item">
+                <img th:if="${post.mediaUrl != null}" th:src="@{${post.mediaUrl}}" class="grid-image" alt="Post Media">
+                <div th:unless="${post.mediaUrl != null}" class="grid-image">
+                    No Media
+                </div>
+                <div class="grid-content">
+                    <div
+                        style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                        <div style="display: flex; align-items: center;">
+                            <img th:src="${post.author.profilePictureUrl != null ? post.author.profilePictureUrl : 'https://via.placeholder.com/25'}"
+                                style="width: 25px; height: 25px; border-radius: 50%; object-fit: cover; margin-right: 10px;">
+                            <a th:href="@{/users/profile/{username}(username=${post.author.username})}"
+                                style="text-decoration: none; color: black; font-weight: bold; font-size: 0.9em;"
+                                th:text="${post.author.username}">User</a>
+                        </div>
+                    </div>
+
+                    <p th:text="${post.content}"
+                        style="font-size: 0.95em; color: #333; margin-top: 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                    </p>
+
+                    <div
+                        style="display: flex; justify-content: space-between; color: gray; font-size: 0.8em; margin-top: 15px; align-items: center;">
+                        <div>
+                            👍 <span th:text="${post.likesCount}">0</span>
+                            💬 <span th:text="${post.commentsCount}">0</span>
+                        </div>
+                        <a th:href="@{/posts/{id}(id=${post.id})}"
+                            style="color: var(--primary-color); text-decoration: none; font-weight: bold;">View</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

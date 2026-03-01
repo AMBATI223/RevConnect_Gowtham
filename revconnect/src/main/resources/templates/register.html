@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>RevConnect - Register</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6 auth-form">
+                <h2 class="text-center mb-4">Join RevConnect</h2>
+
+                <div th:if="${error}" class="alert alert-danger" role="alert">
+                    <p th:text="${error}" class="mb-0"></p>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <form th:action="@{/register}" th:object="${user}" method="post">
+
+                            <div class="mb-3">
+                                <label class="form-label">Username</label>
+                                <input type="text" th:field="*{username}" class="form-control"
+                                    th:classappend="${#fields.hasErrors('username')} ? 'is-invalid' : ''" required />
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('username')}"
+                                    th:errors="*{username}">Username Error</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" th:field="*{email}" class="form-control"
+                                    th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''" required />
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}"
+                                    th:errors="*{email}">Email Error</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Password</label>
+                                <input type="password" th:field="*{password}" class="form-control"
+                                    th:classappend="${#fields.hasErrors('password')} ? 'is-invalid' : ''" required />
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}"
+                                    th:errors="*{password}">Password Error</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Account Type</label>
+                                <select th:field="*{role}" id="roleSelect" class="form-select"
+                                    onchange="toggleBusinessFields()">
+                                    <option value="USER">Personal</option>
+                                    <option value="BUSINESS">Business</option>
+                                </select>
+                            </div>
+
+                            <div id="businessFields" style="display: none;">
+                                <div class="mb-3">
+                                    <label class="form-label">Business Name</label>
+                                    <input type="text" th:field="*{businessName}" class="form-control" />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Industry</label>
+                                    <input type="text" th:field="*{industry}" class="form-control" />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Business Address</label>
+                                    <input type="text" th:field="*{businessAddress}" class="form-control" />
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100 mt-2">Sign Up</button>
+                        </form>
+                    </div>
+                </div>
+
+                <p class="text-center mt-3">Already have an account? <a th:href="@{/login}"
+                        class="text-decoration-none">Login</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleBusinessFields() {
+            var role = document.getElementById("roleSelect").value;
+            var fields = document.getElementById("businessFields");
+            fields.style.display = role === "BUSINESS" ? "block" : "none";
+        }
+        // Run on load to set initial state
+        window.onload = toggleBusinessFields;
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
