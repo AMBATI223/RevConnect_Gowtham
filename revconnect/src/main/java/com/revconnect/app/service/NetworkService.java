@@ -25,4 +25,6 @@ public interface NetworkService {
     boolean areConnected(String user1, String user2);
 
     boolean isPending(String sender, String receiver);
+
+    List<User> getSuggestedProfiles(String username);
 }

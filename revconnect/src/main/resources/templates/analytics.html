@@ -91,27 +91,37 @@
         </div>
 
         <div class="row g-4 mb-5">
-            <div class="col-md-3">
+            <div class="col-md-5ths col-6 col-lg">
                 <div class="card analytics-card shadow-sm border-0 p-3 h-100">
                     <div class="icon-box bg-primary bg-opacity-10 text-primary">
                         <i class="bi bi-eye-fill fs-4"></i>
                     </div>
                     <h6 class="text-muted text-uppercase small fw-bold">Total Reach</h6>
                     <h2 class="fw-bold mb-0" th:text="${totalViews}">0</h2>
-                    <small class="text-success mt-2 d-block"><i class="bi bi-arrow-up"></i> 12% from last month</small>
+                    <small class="text-success mt-2 d-block"><i class="bi bi-arrow-up"></i> 12%</small>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-5ths col-6 col-lg">
                 <div class="card analytics-card shadow-sm border-0 p-3 h-100">
                     <div class="icon-box bg-success bg-opacity-10 text-success">
                         <i class="bi bi-heart-fill fs-4"></i>
                     </div>
                     <h6 class="text-muted text-uppercase small fw-bold">Engagement</h6>
                     <h2 class="fw-bold mb-0" th:text="${totalEngagement}">0</h2>
-                    <small class="text-success mt-2 d-block"><i class="bi bi-arrow-up"></i> 5% from last month</small>
+                    <small class="text-success mt-2 d-block"><i class="bi bi-arrow-up"></i> 5%</small>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-5ths col-6 col-lg">
+                <div class="card analytics-card shadow-sm border-0 p-3 h-100">
+                    <div class="icon-box bg-purple bg-opacity-10 text-purple" style="color: #6f42c1;">
+                        <i class="bi bi-share-fill fs-4"></i>
+                    </div>
+                    <h6 class="text-muted text-uppercase small fw-bold">Total Shares</h6>
+                    <h2 class="fw-bold mb-0" th:text="${totalShares}">0</h2>
+                    <small class="text-muted mt-2 d-block">Content amplification</small>
+                </div>
+            </div>
+            <div class="col-md-5ths col-6 col-lg">
                 <div class="card analytics-card shadow-sm border-0 p-3 h-100">
                     <div class="icon-box bg-info bg-opacity-10 text-info">
                         <i class="bi bi-people-fill fs-4"></i>
@@ -121,7 +131,7 @@
                     <small class="text-success mt-2 d-block"><i class="bi bi-plus-lg"></i> New followers</small>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-5ths col-12 col-lg">
                 <div class="card analytics-card shadow-sm border-0 p-3 h-100">
                     <div class="icon-box bg-warning bg-opacity-10 text-warning">
                         <i class="bi bi-file-post-fill fs-4"></i>
@@ -129,6 +139,30 @@
                     <h6 class="text-muted text-uppercase small fw-bold">Posts</h6>
                     <h2 class="fw-bold mb-0" th:text="${posts.size()}">0</h2>
                     <small class="text-muted mt-2 d-block">Published to date</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Demographics Section -->
+        <div class="row g-4 mb-5">
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-0 rounded-4 h-100">
+                    <div class="card-header bg-white py-3 border-0">
+                        <h5 class="fw-bold mb-0">Follower Locations</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="locationChart" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-0 rounded-4 h-100">
+                    <div class="card-header bg-white py-3 border-0">
+                        <h5 class="fw-bold mb-0">Follower Industries</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="industryChart" height="250"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
@@ -146,6 +180,7 @@
                             <th class="text-center">Reach</th>
                             <th class="text-center">Likes</th>
                             <th class="text-center">Comments</th>
+                            <th class="text-center">Shares</th>
                             <th class="text-center pe-4">Engagement Rate</th>
                         </tr>
                     </thead>
@@ -153,17 +188,18 @@
                         <tr th:each="post : ${posts}">
                             <td class="ps-4" th:text="${#temporals.format(post.createdAt, 'MMM dd, yyyy')}">Date</td>
                             <td class="text-truncate" style="max-width: 300px;" th:text="${post.content}">Content</td>
-                            <td class="text-center fw-bold" th:text="${postViews.get(post.id)}">0</td>
+                            <td class="text-center fw-bold" th:text="${post.reachCount}">0</td>
                             <td class="text-center" th:text="${post.likesCount}">0</td>
                             <td class="text-center" th:text="${post.commentsCount}">0</td>
+                            <td class="text-center" th:text="${post.sharesCount}">0</td>
                             <td class="text-center pe-4">
                                 <span class="badge rounded-pill bg-success bg-opacity-10 text-success px-3"
-                                    th:text="${postViews.get(post.id) > 0 ? ((post.likesCount + post.commentsCount) * 100 / postViews.get(post.id)) + '%' : '0%'}">
+                                    th:text="${post.reachCount > 0 ? ((post.likesCount + post.commentsCount + post.sharesCount) * 100 / post.reachCount) + '%' : '0%'}">
                                     0%</span>
                             </td>
                         </tr>
                         <tr th:if="${posts == null or posts.empty}">
-                            <td colspan="6" class="text-center text-muted py-5">
+                            <td colspan="7" class="text-center text-muted py-5">
                                 <i class="bi bi-bar-chart display-4 mb-3 d-block opacity-25"></i>
                                 No post data available yet.
                             </td>
@@ -174,6 +210,56 @@
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:inline="javascript">
+        // Demographics Data
+        const locationData = /*[[${locationDemographics}]]*/ {};
+        const industryData = /*[[${industryDemographics}]]*/ {};
+
+        // Location Chart
+        const locCtx = document.getElementById('locationChart').getContext('2d');
+        new Chart(locCtx, {
+            type: 'pie',
+            data: {
+                labels: Object.keys(locationData),
+                datasets: [{
+                    data: Object.values(locationData),
+                    backgroundColor: ['#0d6efd', '#6610f2', '#6f42c1', '#d63384', '#dc3545', '#fd7e14', '#ffc107', '#198754', '#20c997', '#0dcaf0']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+
+        // Industry Chart
+        const indCtx = document.getElementById('industryChart').getContext('2d');
+        new Chart(indCtx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(industryData),
+                datasets: [{
+                    label: 'Followers by Category',
+                    data: Object.values(industryData),
+                    backgroundColor: '#0dcaf0',
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>

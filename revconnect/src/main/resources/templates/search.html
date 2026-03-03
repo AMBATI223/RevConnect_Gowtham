@@ -172,7 +172,7 @@
                                 </div>
                             </div>
                             <p class="card-text small" th:text="${post.content}"
-                                style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                                style="display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
                             </p>
                             <div th:if="${post.mediaUrl}" class="mb-2 text-center">
                                 <img th:src="@{${post.mediaUrl}}" class="rounded img-fluid"

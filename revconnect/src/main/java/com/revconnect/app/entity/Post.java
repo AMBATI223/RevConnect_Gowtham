@@ -37,23 +37,31 @@ public class Post {
     private String ctaLabel;
     private String ctaLink;
     private LocalDateTime scheduledFor;
-    @Column(columnDefinition = "number(1,0) default 0")
-    private boolean isPinned;
-    @Column(columnDefinition = "number(1,0) default 0")
-    private boolean isPromotional;
-    @Column(columnDefinition = "number(1,0) default 1")
+    @Column(name = "is_pinned", nullable = false)
+    private boolean isPinned = false;
+    @Column(name = "is_promotional", nullable = false)
+    private boolean isPromotional = false;
+    @Column(name = "is_published", nullable = false)
     private boolean isPublished = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_post_id")
     private Post parentPost;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    private ProductServiceItem taggedProduct;
+
+    private long reachCount;
+    private long sharesCount;
+
     public Post() {
     }
 
     public Post(Long id, String content, String hashtags, User author, LocalDateTime createdAt, String mediaUrl,
             int likesCount, int commentsCount, String ctaLabel, String ctaLink, LocalDateTime scheduledFor,
-            boolean isPinned, boolean isPromotional, boolean isPublished, Post parentPost) {
+            boolean isPinned, boolean isPromotional, boolean isPublished, Post parentPost,
+            ProductServiceItem taggedProduct, long reachCount, long sharesCount) {
         this.id = id;
         this.content = content;
         this.hashtags = hashtags;
@@ -69,6 +77,9 @@ public class Post {
         this.isPromotional = isPromotional;
         this.isPublished = isPublished;
         this.parentPost = parentPost;
+        this.taggedProduct = taggedProduct;
+        this.reachCount = reachCount;
+        this.sharesCount = sharesCount;
     }
 
     public static PostBuilder builder() {
@@ -195,6 +206,30 @@ public class Post {
         this.parentPost = parentPost;
     }
 
+    public ProductServiceItem getTaggedProduct() {
+        return taggedProduct;
+    }
+
+    public void setTaggedProduct(ProductServiceItem taggedProduct) {
+        this.taggedProduct = taggedProduct;
+    }
+
+    public long getReachCount() {
+        return reachCount;
+    }
+
+    public void setReachCount(long reachCount) {
+        this.reachCount = reachCount;
+    }
+
+    public long getSharesCount() {
+        return sharesCount;
+    }
+
+    public void setSharesCount(long sharesCount) {
+        this.sharesCount = sharesCount;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -226,6 +261,9 @@ public class Post {
         private boolean isPromotional;
         private boolean isPublished = true;
         private Post parentPost;
+        private ProductServiceItem taggedProduct;
+        private long reachCount;
+        private long sharesCount;
 
         PostBuilder() {
         }
@@ -305,9 +343,25 @@ public class Post {
             return this;
         }
 
+        public PostBuilder taggedProduct(ProductServiceItem taggedProduct) {
+            this.taggedProduct = taggedProduct;
+            return this;
+        }
+
+        public PostBuilder reachCount(long reachCount) {
+            this.reachCount = reachCount;
+            return this;
+        }
+
+        public PostBuilder sharesCount(long sharesCount) {
+            this.sharesCount = sharesCount;
+            return this;
+        }
+
         public Post build() {
             return new Post(id, content, hashtags, author, createdAt, mediaUrl, likesCount, commentsCount, ctaLabel,
-                    ctaLink, scheduledFor, isPinned, isPromotional, isPublished, parentPost);
+                    ctaLink, scheduledFor, isPinned, isPromotional, isPublished, parentPost, taggedProduct,
+                    reachCount, sharesCount);
         }
 
     }

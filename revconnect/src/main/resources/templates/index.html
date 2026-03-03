@@ -58,6 +58,11 @@
                         </a>
                     </li>
                     <li class="nav-item px-2">
+                        <a class="nav-link" th:href="@{/settings}" title="Settings">
+                            <i class="bi bi-gear fs-5"></i><span class="d-lg-none ms-2">Settings</span>
+                        </a>
+                    </li>
+                    <li class="nav-item px-2">
                         <a class="nav-link d-flex align-items-center" th:href="@{/users}">
                             <img th:src="${currentUser != null and currentUser.profilePictureUrl != null ? currentUser.profilePictureUrl : 'https://via.placeholder.com/32'}"
                                 class="rounded-circle border" style="width: 32px; height: 32px; object-fit: cover;">
@@ -214,10 +219,17 @@
                                             <option value="Sign Up">Sign Up</option>
                                         </select>
                                     </div>
-                                    <div class="mb-0">
-                                        <label class="form-label small">Tagged Products (comma separated)</label>
-                                        <input type="text" name="taggedProducts" class="form-control form-control-sm"
-                                            placeholder="e.g. Laptop, Mouse">
+                                    <div class="mb-0" th:if="${products != null and !products.empty}">
+                                        <label class="form-label small">Tag a Product</label>
+                                        <select name="taggedProductId" class="form-select form-select-sm">
+                                            <option value="">Select a product...</option>
+                                            <option th:each="prod : ${products}" th:value="${prod.id}"
+                                                th:text="${prod.name}">Product Name</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-0" th:if="${products == null or products.empty}">
+                                        <p class="text-muted small">No products found in your business profile. <a
+                                                th:href="@{/users/profile/edit}">Add some here</a>.</p>
                                     </div>
                                 </div>
                             </div>
@@ -269,8 +281,35 @@
                                     style="max-height: 400px; object-fit: contain;">
                             </div>
 
+                            <!-- Tagged Product Info -->
+                            <div th:if="${post.taggedProduct != null}" class="card mb-3 border-primary bg-light">
+                                <div class="card-body p-2 d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center">
+                                        <img th:src="${post.taggedProduct.imageUrl != null ? post.taggedProduct.imageUrl : 'https://via.placeholder.com/48'}"
+                                            class="rounded me-2" style="width: 48px; height: 48px; object-fit: cover;">
+                                        <div>
+                                            <h6 class="mb-0 small fw-bold" th:text="${post.taggedProduct.name}">Product
+                                                Name</h6>
+                                            <p class="mb-0 x-small text-muted"
+                                                th:text="'$' + ${post.taggedProduct.price}">$0.00</p>
+                                        </div>
+                                    </div>
+                                    <a th:if="${post.ctaLink != null}" th:href="${post.ctaLink}"
+                                        class="btn btn-primary btn-sm rounded-pill px-3"
+                                        th:text="${post.ctaLabel != null ? post.ctaLabel : 'View Product'}">View</a>
+                                </div>
+                            </div>
 
-                            <p th:if="${post.hashtags}" th:text="${post.hashtags}" class="text-primary small"></p>
+                            <div class="d-flex justify-content-between mb-2">
+                                <p th:if="${post.hashtags}" th:text="${post.hashtags}" class="text-primary small mb-0">
+                                </p>
+                                <div class="small text-muted">
+                                    <span class="me-2"><i class="bi bi-eye"></i> <span
+                                            th:text="${post.reachCount}">0</span></span>
+                                    <span><i class="bi bi-share"></i> <span
+                                            th:text="${post.sharesCount}">0</span></span>
+                                </div>
+                            </div>
 
                             <div class="d-flex justify-content-between align-items-center border-top pt-3 mt-3">
                                 <div class="d-flex gap-3 align-items-center">
@@ -283,9 +322,10 @@
                                     </form>
 
                                     <!-- Comment Toggle Button -->
-                                    <button type="button" class="action-btn"
-                                        th:attr="data-bs-toggle='collapse', data-bs-target='#commentForm-' + ${post.id}">
-                                        💬 <span th:text="${post.commentsCount}">0</span> Comment
+                                    <button type="button" class="action-btn toggle-comments-btn"
+                                        th:data-post-id="${post.id}">
+                                        💬 <span th:id="'comment-count-' + ${post.id}"
+                                            th:text="${post.commentsCount}">0</span> Comment
                                     </button>
 
                                     <!-- Share Button -->
@@ -297,11 +337,10 @@
                                     </form>
                                 </div>
                                 <div class="d-flex gap-2 align-items-center">
-                                    <span th:if="${post.commentsCount > 0}"
-                                        th:onclick="'toggleComments(' + ${post.id} + ')'" class="view-comments-link"
-                                        style="cursor: pointer;">
-                                        View all <span th:text="${post.commentsCount}">0</span> comments
-                                    </span>
+                                    <a th:if="${post.commentsCount > 0}" th:href="@{/posts/{id}(id=${post.id})}"
+                                        class="view-comments-link" style="cursor: pointer; text-decoration: none;">
+                                        View full post template
+                                    </a>
                                     <form th:action="@{/saved/{id}(id=${post.id})}" method="post" class="m-0">
                                         <button type="submit"
                                             class="btn btn-link text-primary fs-5 p-0 text-decoration-none"
@@ -310,23 +349,17 @@
                                 </div>
                             </div>
 
-                            <!-- Inline Comments Container -->
-                            <div th:id="'comments-section-' + ${post.id}" class="inline-comments-section"
-                                style="display: none;">
-                                <div th:id="'comments-list-' + ${post.id}">
-                                    <!-- Comments will be loaded here via AJAX -->
-                                </div>
-                            </div>
-
-
-
                             <!-- Hidden Comment Form -->
-                            <div th:id="'commentForm-' + ${post.id}" class="collapse mt-3 border-top pt-3">
+                            <div th:id="'commentForm-' + ${post.id}"
+                                style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #eee;">
+                                <div th:id="'commentsList-' + ${post.id}" class="mb-3"></div>
                                 <form th:action="@{/interactions/post/{id}/comment(id=${post.id})}" method="post"
-                                    class="d-flex gap-2 m-0">
+                                    style="display: flex; gap: 10px; margin: 0;">
                                     <input type="text" name="content" class="form-control"
-                                        placeholder="Add a comment..." required>
-                                    <button type="submit" class="btn btn-primary">Post</button>
+                                        placeholder="Add a comment..." required
+                                        style="flex-grow: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                                    <button type="submit"
+                                        style="padding: 8px 15px; margin: 0; background: var(--primary-color); color: white; border: none; border-radius: 4px;">Post</button>
                                 </form>
                             </div>
                         </div>
@@ -386,12 +419,31 @@
                     </div>
                 </div>
 
-                <div class="card shadow-sm border-0 rounded-3">
+                <div th:if="${suggestedProfiles != null and !suggestedProfiles.empty}"
+                    class="card shadow-sm border-0 rounded-3 mb-4">
                     <div class="card-body">
                         <h6 class="fw-bold mb-3"><i class="bi bi-lightbulb text-warning me-2"></i>Suggestions</h6>
-                        <p class="text-muted small">Follow creators and businesses to personalize your feed!</p>
-                        <a th:href="@{/users/search}" class="btn btn-outline-primary btn-sm rounded-pill w-100">Find
-                            People</a>
+                        <div th:each="suggestion : ${suggestedProfiles}"
+                            class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+                            <div class="d-flex align-items-center">
+                                <img th:src="${suggestion.profilePictureUrl != null ? suggestion.profilePictureUrl : 'https://via.placeholder.com/32'}"
+                                    class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
+                                <div>
+                                    <a th:href="@{/users/profile/{username}(username=${suggestion.username})}"
+                                        class="text-dark fw-bold text-decoration-none small d-block"
+                                        th:text="${suggestion.username}">User</a>
+                                    <span class="badge bg-light text-muted x-small" style="font-size: 0.65rem;"
+                                        th:text="${suggestion.role}">Role</span>
+                                </div>
+                            </div>
+                            <form th:action="@{/network/follow/{username}(username=${suggestion.username})}"
+                                method="post" class="m-0">
+                                <button type="submit" class="btn btn-primary btn-sm rounded-pill py-0 px-2"
+                                    style="font-size: 0.75rem;">Follow</button>
+                            </form>
+                        </div>
+                        <a th:href="@{/users/search}"
+                            class="btn btn-link btn-sm text-decoration-none w-100 p-0 text-center">Find more people</a>
                     </div>
                 </div>
             </div>
@@ -427,43 +479,7 @@
             container.style.display = 'none';
         }
     </script>
-    <script th:inline="javascript">
-        async function toggleComments(postId) {
-            const section = document.getElementById(`comments-section-${postId}`);
-            const list = document.getElementById(`comments-list-${postId}`);
-
-            if (section.style.display === 'none') {
-                section.style.display = 'block';
-                list.innerHTML = '<div class="text-center py-2"><div class="spinner-border spinner-border-sm text-primary"></div></div>';
-
-                try {
-                    const response = await fetch(`/api/interactions/post/${postId}/comments`);
-                    const comments = await response.json();
-
-                    if (comments.length === 0) {
-                        list.innerHTML = '<p class="text-muted small text-center">No comments yet.</p>';
-                        return;
-                    }
-
-                    list.innerHTML = comments.map(comment => `
-                        <div class="inline-comment-item">
-                            <img src="${comment.user.profilePictureUrl || 'https://via.placeholder.com/32'}" class="inline-comment-avatar">
-                            <div class="inline-comment-bubble">
-                                <a href="/users/profile/${comment.user.username}" class="inline-comment-user">${comment.user.username}</a>
-                                <span class="inline-comment-text">${comment.content}</span>
-                                <small class="inline-comment-date">${new Date(comment.createdAt).toLocaleDateString([], { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</small>
-                            </div>
-                        </div>
-                    `).join('');
-                } catch (error) {
-                    list.innerHTML = '<p class="text-danger small text-center">Error loading comments.</p>';
-                    console.error('Error:', error);
-                }
-            } else {
-                section.style.display = 'none';
-            }
-        }
-    </script>
+    <script th:src="@{/js/app.js}"></script>
 </body>
 
 

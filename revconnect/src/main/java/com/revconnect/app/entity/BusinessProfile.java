@@ -11,6 +11,7 @@ public class BusinessProfile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "USER_ID", nullable = false)
     private User user;

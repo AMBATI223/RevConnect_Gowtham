@@ -53,9 +53,17 @@ public class AuthRestController {
     public ResponseEntity<?> register(@Valid @RequestBody RegistrationDTO registrationDTO) {
         try {
             userService.registerUser(registrationDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
+            String jwt = jwtUtil.generateToken(registrationDTO.getUsername());
+            Map<String, String> response = new HashMap<>();
+            response.put("token", jwt);
+            response.put("username", registrationDTO.getUsername());
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new HashMap<String, String>() {
+                {
+                    put("message", e.getMessage());
+                }
+            });
         }
     }
 }

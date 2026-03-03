@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RevConnect | Professional Networking Platform</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f3f6f9;
+            margin: 0;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: #0a66c2;
+            padding: 12px 0;
+        }
+
+        .navbar-brand {
+            color: white !important;
+            font-weight: bold;
+            font-size: 24px;
+        }
+
+        .btn-login {
+            border: 1px solid white;
+            color: white;
+            margin-right: 10px;
+        }
+
+        .btn-login:hover {
+            background-color: white;
+            color: #0a66c2;
+        }
+
+        .btn-signup {
+            background-color: white;
+            color: #0a66c2;
+            font-weight: 600;
+        }
+
+        .btn-signup:hover {
+            background-color: #e6f0fa;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 120px 0 80px;
+            background-color: white;
+        }
+
+        .hero-title {
+            font-size: 48px;
+            font-weight: 700;
+            color: #0a66c2;
+        }
+
+        .hero-subtitle {
+            font-size: 20px;
+            margin-top: 20px;
+            color: #555;
+            max-width: 600px;
+        }
+
+        .hero-btn {
+            margin-top: 30px;
+            padding: 12px 35px;
+            font-size: 18px;
+            background-color: #0a66c2;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        .hero-btn:hover {
+            background-color: #004182;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #0a66c2;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">RevConnect</a>
+
+            <!-- Removed UL items here -->
+
+            <div class="ms-auto">
+                <a th:href="@{/login}" class="btn btn-login">Login</a>
+                <a th:href="@{/register}" class="btn btn-signup">Join Now</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="hero-title">Connect. Grow. Succeed.</h1>
+                    <p class="hero-subtitle">
+                        RevConnect is a professional social media platform where entrepreneurs,
+                        developers, and creators connect, share ideas, and build opportunities.
+                    </p>
+                    <a th:href="@{/register}" class="hero-btn">Start Connecting</a>
+                </div>
+
+                <div class="col-lg-6 text-center">
+                    <img th:src="@{/images/social-hero.png}" class="img-fluid" alt="Networking Image">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <div class="footer">
+        © 2026 RevConnect | Built with Spring Boot
+    </div>
+
+</body>
+
+</html>

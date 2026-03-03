@@ -10,10 +10,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 @Transactional
 public class NetworkServiceImpl implements NetworkService {
+    private static final Logger log = LoggerFactory.getLogger(NetworkServiceImpl.class);
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
@@ -108,7 +111,7 @@ public class NetworkServiceImpl implements NetworkService {
 
     @Override
     public void followUser(String followerUsername, String followingUsername) {
-        System.out.println("FOLLOW: " + followerUsername + " -> " + followingUsername);
+        log.info("FOLLOW: {} -> {}", followerUsername, followingUsername);
         User follower = userRepository.findByUsername(followerUsername).orElseThrow();
         User following = userRepository.findByUsername(followingUsername).orElseThrow();
 
@@ -117,22 +120,22 @@ public class NetworkServiceImpl implements NetworkService {
                 && !follower.equals(following)) {
             Follow follow = Follow.builder().follower(follower).following(following).build();
             followRepository.save(follow);
-            System.out.println("FOLLOW SAVED: " + follow.getId());
+            log.info("FOLLOW SAVED: {}", follow.getId());
             notificationService.createNotification(following, NotificationType.NEW_FOLLOWER, follow.getId(),
                     followerUsername + " started following you");
         } else {
-            System.out.println("FOLLOW SKIPPED: Already following or self-follow");
+            log.info("FOLLOW SKIPPED: Already following or self-follow");
         }
     }
 
     @Override
     public void unfollowUser(String followerUsername, String followingUsername) {
-        System.out.println("UNFOLLOW: " + followerUsername + " -> " + followingUsername);
+        log.info("UNFOLLOW: {} -> {}", followerUsername, followingUsername);
         User follower = userRepository.findByUsername(followerUsername).orElseThrow();
         User following = userRepository.findByUsername(followingUsername).orElseThrow();
         followRepository.findByFollowerAndFollowing(follower, following).ifPresent(f -> {
             followRepository.delete(f);
-            System.out.println("UNFOLLOW DELETED: " + f.getId());
+            log.info("UNFOLLOW DELETED: {}", f.getId());
         });
     }
 
@@ -141,7 +144,7 @@ public class NetworkServiceImpl implements NetworkService {
         User user = userRepository.findByUsername(username).orElseThrow();
         List<User> result = followRepository.findByFollowing(user).stream().map(Follow::getFollower)
                 .collect(Collectors.toList());
-        System.out.println("GET FOLLOWERS for " + username + ": " + result.size());
+        log.info("GET FOLLOWERS for {}: {}", username, result.size());
         return result;
     }
 
@@ -150,7 +153,7 @@ public class NetworkServiceImpl implements NetworkService {
         User user = userRepository.findByUsername(username).orElseThrow();
         List<User> result = followRepository.findByFollower(user).stream().map(Follow::getFollowing)
                 .collect(Collectors.toList());
-        System.out.println("GET FOLLOWING for " + username + ": " + result.size());
+        log.info("GET FOLLOWING for {}: {}", username, result.size());
         return result;
     }
 
@@ -164,5 +167,10 @@ public class NetworkServiceImpl implements NetworkService {
         return connectionRepository.findBySenderAndReceiver(u1, u2)
                 .map(c -> c.getStatus() == ConnectionStatus.PENDING)
                 .orElse(false);
+    }
+
+    @Override
+    public List<User> getSuggestedProfiles(String username) {
+        return userRepository.findSuggestedProfiles(username);
     }
 }

@@ -36,6 +36,8 @@ public class PostServiceImplTest {
     private SavedPostRepository savedPostRepository;
     @Mock
     private PostViewStatsRepository postViewStatsRepository;
+    @Mock
+    private ProductServiceItemRepository productRepository;
 
     private PostServiceImpl postService;
 
@@ -63,7 +65,7 @@ public class PostServiceImplTest {
         postService = new PostServiceImpl(
                 postRepository, userRepository, fileStorageService,
                 commentRepository, likeRepository, shareRepository,
-                savedPostRepository, postViewStatsRepository);
+                savedPostRepository, postViewStatsRepository, productRepository);
     }
 
     @Test
@@ -73,7 +75,8 @@ public class PostServiceImplTest {
         when(postRepository.save(any(Post.class))).thenAnswer(i -> i.getArgument(0));
 
         assertDoesNotThrow(
-                () -> postService.createPost("alice", "Hello world!", "#test", null, null, null, null, false, false));
+                () -> postService.createPost("alice", "Hello world!", "#test", null, null, null, null, false, false,
+                        null));
 
         verify(postRepository).save(any(Post.class));
     }
@@ -82,8 +85,8 @@ public class PostServiceImplTest {
     void createPost_UnknownUser_ThrowsException() {
         when(userRepository.findByUsername("nobody")).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () ->
-                postService.createPost("nobody", "Hello", null, null, null, null, null, false, false));
+        assertThrows(RuntimeException.class, () -> postService.createPost("nobody", "Hello", null, null, null, null,
+                null, false, false, null));
 
         verify(postRepository, never()).save(any());
     }
@@ -144,7 +147,7 @@ public class PostServiceImplTest {
         when(postRepository.save(any(Post.class))).thenAnswer(i -> i.getArgument(0));
 
         assertDoesNotThrow(() -> postService.updatePost(1L, "alice", "Updated content", "#updated", null, null, null,
-                false, false));
+                false, false, null));
         assertEquals("Updated content", post.getContent());
     }
 
@@ -155,7 +158,7 @@ public class PostServiceImplTest {
         when(postRepository.findById(1L)).thenReturn(Optional.of(post));
 
         assertThrows(RuntimeException.class,
-                () -> postService.updatePost(1L, "bob", "Hacked content", null, null, null, null, false, false));
+                () -> postService.updatePost(1L, "bob", "Hacked content", null, null, null, null, false, false, null));
         verify(postRepository, never()).save(any());
     }
 

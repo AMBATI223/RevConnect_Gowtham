@@ -2,6 +2,8 @@ package com.revconnect.app.worker;
 
 import com.revconnect.app.entity.Post;
 import com.revconnect.app.repository.PostRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -10,6 +12,8 @@ import java.util.List;
 
 @Component
 public class ScheduledPostWorker {
+
+    private static final Logger log = LoggerFactory.getLogger(ScheduledPostWorker.class);
 
     private final PostRepository postRepository;
 
@@ -25,7 +29,7 @@ public class ScheduledPostWorker {
         for (Post post : postsToPublish) {
             post.setPublished(true);
             postRepository.save(post);
-            System.out.println("Published scheduled post ID: " + post.getId());
+            log.info("Published scheduled post ID: {}", post.getId());
         }
     }
 }

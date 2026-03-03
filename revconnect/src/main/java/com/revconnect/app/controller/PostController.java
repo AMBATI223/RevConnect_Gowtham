@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 public class PostController {
     private final PostService postService;
     private final com.revconnect.app.service.InteractionService interactionService;
+    private final com.revconnect.app.repository.UserRepository userRepository;
+    private final com.revconnect.app.repository.ProductServiceItemRepository productRepository;
 
     @PostMapping("/create")
     public String createPost(@AuthenticationPrincipal UserDetails userDetails,
@@ -26,9 +28,10 @@ public class PostController {
             @RequestParam(required = false) String ctaLink,
             @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime scheduledFor,
             @RequestParam(required = false, defaultValue = "false") boolean isPinned,
-            @RequestParam(required = false, defaultValue = "false") boolean isPromotional) {
+            @RequestParam(required = false, defaultValue = "false") boolean isPromotional,
+            @RequestParam(required = false) Long taggedProductId) {
         postService.createPost(userDetails.getUsername(), content, hashtags, image, ctaLabel, ctaLink, scheduledFor,
-                isPinned, isPromotional);
+                isPinned, isPromotional, taggedProductId);
         return "redirect:/";
     }
 
@@ -39,9 +42,10 @@ public class PostController {
             @RequestParam(required = false) String ctaLink,
             @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime scheduledFor,
             @RequestParam(required = false, defaultValue = "false") boolean isPinned,
-            @RequestParam(required = false, defaultValue = "false") boolean isPromotional) {
+            @RequestParam(required = false, defaultValue = "false") boolean isPromotional,
+            @RequestParam(required = false) Long taggedProductId) {
         postService.updatePost(id, userDetails.getUsername(), content, hashtags, ctaLabel, ctaLink, scheduledFor,
-                isPinned, isPromotional);
+                isPinned, isPromotional, taggedProductId);
         return "redirect:/posts/" + id;
     }
 
@@ -65,6 +69,17 @@ public class PostController {
         model.addAttribute("comments", interactionService.getCommentsForPost(id));
         if (userDetails != null) {
             model.addAttribute("currentUsername", userDetails.getUsername());
+            interactionService.trackView(id, userDetails.getUsername());
+
+            userRepository.findByUsername(userDetails.getUsername()).ifPresent(user -> {
+                if (user.getRole() == com.revconnect.app.entity.Role.BUSINESS
+                        || user.getRole() == com.revconnect.app.entity.Role.CREATOR) {
+                    if (user.getBusinessProfile() != null) {
+                        model.addAttribute("products",
+                                productRepository.findByBusinessProfile(user.getBusinessProfile()));
+                    }
+                }
+            });
         } else {
             model.addAttribute("currentUsername", null);
         }
@@ -72,8 +87,12 @@ public class PostController {
     }
 
     public PostController(final PostService postService,
-            final com.revconnect.app.service.InteractionService interactionService) {
+            final com.revconnect.app.service.InteractionService interactionService,
+            final com.revconnect.app.repository.UserRepository userRepository,
+            final com.revconnect.app.repository.ProductServiceItemRepository productRepository) {
         this.postService = postService;
         this.interactionService = interactionService;
+        this.userRepository = userRepository;
+        this.productRepository = productRepository;
     }
 }

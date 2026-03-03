@@ -6,8 +6,10 @@ import com.revconnect.app.repository.LikeRepository;
 import com.revconnect.app.repository.ShareRepository;
 import com.revconnect.app.repository.SavedPostRepository;
 import com.revconnect.app.repository.PostViewStatsRepository;
+import com.revconnect.app.repository.ProductServiceItemRepository;
 import com.revconnect.app.repository.UserRepository;
 import com.revconnect.app.entity.Post;
+import com.revconnect.app.entity.ProductServiceItem;
 import com.revconnect.app.entity.User;
 import com.revconnect.app.service.FileStorageService;
 import com.revconnect.app.service.PostService;
@@ -31,6 +33,7 @@ public class PostServiceImpl implements PostService {
     private final ShareRepository shareRepository;
     private final SavedPostRepository savedPostRepository;
     private final PostViewStatsRepository postViewStatsRepository;
+    private final ProductServiceItemRepository productRepository;
 
     public PostServiceImpl(PostRepository postRepository, UserRepository userRepository,
             FileStorageService fileStorageService,
@@ -38,7 +41,8 @@ public class PostServiceImpl implements PostService {
             LikeRepository likeRepository,
             ShareRepository shareRepository,
             SavedPostRepository savedPostRepository,
-            PostViewStatsRepository postViewStatsRepository) {
+            PostViewStatsRepository postViewStatsRepository,
+            ProductServiceItemRepository productRepository) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.fileStorageService = fileStorageService;
@@ -47,12 +51,13 @@ public class PostServiceImpl implements PostService {
         this.shareRepository = shareRepository;
         this.savedPostRepository = savedPostRepository;
         this.postViewStatsRepository = postViewStatsRepository;
+        this.productRepository = productRepository;
     }
 
     @Override
     public void createPost(String username, String content, String hashtags, MultipartFile imageFile,
             String ctaLabel, String ctaLink, LocalDateTime scheduledFor,
-            boolean isPinned, boolean isPromotional) {
+            boolean isPinned, boolean isPromotional, Long taggedProductId) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
         String mediaUrl = null;
         if (imageFile != null && !imageFile.isEmpty()) {
@@ -61,6 +66,12 @@ public class PostServiceImpl implements PostService {
         }
 
         boolean isPublished = scheduledFor == null || !scheduledFor.isAfter(LocalDateTime.now());
+
+        ProductServiceItem taggedProduct = null;
+        if (taggedProductId != null) {
+            taggedProduct = productRepository.findById(taggedProductId)
+                    .orElseThrow(() -> new RuntimeException("Product not found"));
+        }
 
         Post post = Post.builder()
                 .content(content)
@@ -73,6 +84,7 @@ public class PostServiceImpl implements PostService {
                 .isPinned(isPinned)
                 .isPromotional(isPromotional)
                 .isPublished(isPublished)
+                .taggedProduct(taggedProduct)
                 .build();
         postRepository.save(post);
     }
@@ -80,13 +92,19 @@ public class PostServiceImpl implements PostService {
     @Override
     public void updatePost(Long id, String username, String content, String hashtags,
             String ctaLabel, String ctaLink, LocalDateTime scheduledFor,
-            boolean isPinned, boolean isPromotional) {
+            boolean isPinned, boolean isPromotional, Long taggedProductId) {
         Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("Post not found"));
         if (!post.getAuthor().getUsername().equals(username)) {
             throw new RuntimeException("Unauthorized to edit this post");
         }
 
         boolean isPublished = scheduledFor == null || !scheduledFor.isAfter(LocalDateTime.now());
+
+        ProductServiceItem taggedProduct = null;
+        if (taggedProductId != null) {
+            taggedProduct = productRepository.findById(taggedProductId)
+                    .orElseThrow(() -> new RuntimeException("Product not found"));
+        }
 
         post.setContent(content);
         post.setHashtags(hashtags);
@@ -96,6 +114,7 @@ public class PostServiceImpl implements PostService {
         post.setPinned(isPinned);
         post.setPromotional(isPromotional);
         post.setPublished(isPublished);
+        post.setTaggedProduct(taggedProduct);
 
         postRepository.save(post);
     }
@@ -158,6 +177,11 @@ public class PostServiceImpl implements PostService {
             feed = postRepository.findPersonalizedFeed(user);
         }
 
+        if (feed == null || feed.isEmpty()) {
+            // Fallback for new users: Show public posts from business/creator accounts
+            feed = postRepository.findPromotedPublicFeed();
+        }
+
         if (postType != null) {
             if ("media".equals(postType)) {
                 feed = feed.stream().filter(p -> p.getMediaUrl() != null && !p.getMediaUrl().isEmpty())
@@ -181,10 +205,11 @@ public class PostServiceImpl implements PostService {
         LocalDateTime since = LocalDateTime.now().minusDays(30);
         List<String> rawHashtags = postRepository.findRecentHashtags(since);
         return rawHashtags.stream()
-                .flatMap(h -> Arrays.stream(h.split(",")))
+                .flatMap(h -> Arrays.stream(h.split("[,\\s]+")))
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
-                .collect(Collectors.groupingBy(s -> s, Collectors.counting()))
+                .map(s -> s.startsWith("#") ? s.substring(1) : s)
+                .collect(Collectors.groupingBy(s -> s.toLowerCase(), Collectors.counting()))
                 .entrySet().stream()
                 .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
                 .limit(10)

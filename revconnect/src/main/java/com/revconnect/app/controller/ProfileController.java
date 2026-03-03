@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 public class ProfileController {
     private final UserRepository userRepository;
     private final PostService postService;
+    private final PostRepository postRepository;
     private final ProductServiceItemRepository productServiceItemRepository;
     private final FileStorageService fileStorageService;
     private final NetworkService networkService;
@@ -37,6 +38,8 @@ public class ProfileController {
         model.addAttribute("posts", postService.getPostsByAuthor(user));
         model.addAttribute("followersCount", networkService.getFollowers(user.getUsername()).size());
         model.addAttribute("followingCount", networkService.getFollowing(user.getUsername()).size());
+        model.addAttribute("totalLikes", postRepository.countTotalLikesByAuthor(user));
+        model.addAttribute("totalComments", postRepository.countTotalCommentsByAuthor(user));
 
         if (user.getRole() == Role.BUSINESS || user.getRole() == Role.CREATOR) {
             if (user.getBusinessProfile() == null) {
@@ -46,8 +49,12 @@ public class ProfileController {
                 // We don't necessarily need to save it here, just make it available for the
                 // model
             }
-            model.addAttribute("products",
-                    productServiceItemRepository.findByBusinessProfile(user.getBusinessProfile()));
+            if (user.getBusinessProfile().getId() != null) {
+                model.addAttribute("products",
+                        productServiceItemRepository.findByBusinessProfile(user.getBusinessProfile()));
+            } else {
+                model.addAttribute("products", List.of());
+            }
         }
 
         model.addAttribute("isOwner", true);
@@ -107,14 +114,20 @@ public class ProfileController {
 
         if (canView) {
             model.addAttribute("posts", postService.getPostsByAuthor(targetUser));
+            model.addAttribute("totalLikes", postRepository.countTotalLikesByAuthor(targetUser));
+            model.addAttribute("totalComments", postRepository.countTotalCommentsByAuthor(targetUser));
             if (targetUser.getRole() == Role.BUSINESS || targetUser.getRole() == Role.CREATOR) {
                 if (targetUser.getBusinessProfile() == null) {
                     BusinessProfile bp = new BusinessProfile();
                     bp.setUser(targetUser);
                     targetUser.setBusinessProfile(bp);
                 }
-                model.addAttribute("products",
-                        productServiceItemRepository.findByBusinessProfile(targetUser.getBusinessProfile()));
+                if (targetUser.getBusinessProfile().getId() != null) {
+                    model.addAttribute("products",
+                            productServiceItemRepository.findByBusinessProfile(targetUser.getBusinessProfile()));
+                } else {
+                    model.addAttribute("products", List.of());
+                }
             }
         } else {
             model.addAttribute("posts", List.of());
@@ -270,11 +283,13 @@ public class ProfileController {
     }
 
     public ProfileController(final UserRepository userRepository, final PostService postService,
+            final PostRepository postRepository,
             final ProductServiceItemRepository productServiceItemRepository,
             final FileStorageService fileStorageService,
             final NetworkService networkService) {
         this.userRepository = userRepository;
         this.postService = postService;
+        this.postRepository = postRepository;
         this.productServiceItemRepository = productServiceItemRepository;
         this.fileStorageService = fileStorageService;
         this.networkService = networkService;

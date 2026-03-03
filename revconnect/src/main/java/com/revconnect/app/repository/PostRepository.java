@@ -52,4 +52,13 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
         @Query("SELECT p FROM Post p WHERE p.isPublished = true AND p.author.isPrivateProfile = false AND p.createdAt >= :since ORDER BY (p.likesCount + p.commentsCount * 2) DESC")
         List<Post> findTrendingPosts(@Param("since") LocalDateTime since);
+
+        @Query("SELECT p FROM Post p WHERE p.isPublished = true AND p.author.isPrivateProfile = false AND (p.author.role = com.revconnect.app.entity.Role.BUSINESS OR p.author.role = com.revconnect.app.entity.Role.CREATOR) ORDER BY p.createdAt DESC")
+        List<Post> findPromotedPublicFeed();
+
+        @Query("SELECT COALESCE(SUM(p.likesCount), 0) FROM Post p WHERE p.author = :author")
+        long countTotalLikesByAuthor(@Param("author") User author);
+
+        @Query("SELECT COALESCE(SUM(p.commentsCount), 0) FROM Post p WHERE p.author = :author")
+        long countTotalCommentsByAuthor(@Param("author") User author);
 }

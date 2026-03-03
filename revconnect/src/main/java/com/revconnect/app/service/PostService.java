@@ -8,11 +8,11 @@ import java.util.List;
 public interface PostService {
         void createPost(String username, String content, String hashtags, MultipartFile imageFile,
                         String ctaLabel, String ctaLink, java.time.LocalDateTime scheduledFor,
-                        boolean isPinned, boolean isPromotional);
+                        boolean isPinned, boolean isPromotional, Long taggedProductId);
 
         void updatePost(Long id, String username, String content, String hashtags,
                         String ctaLabel, String ctaLink, java.time.LocalDateTime scheduledFor,
-                        boolean isPinned, boolean isPromotional);
+                        boolean isPinned, boolean isPromotional, Long taggedProductId);
 
         void deletePost(Long id, String username);
 

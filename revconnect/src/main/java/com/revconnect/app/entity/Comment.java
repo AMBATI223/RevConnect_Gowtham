@@ -15,6 +15,7 @@ public class Comment {
     private Long id;
     @Column(nullable = false, length = 1000)
     private String content;
+    @com.fasterxml.jackson.annotation.JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
@@ -23,12 +24,14 @@ public class Comment {
     private User user;
     @CreationTimestamp
     private LocalDateTime createdAt;
+
     public static class CommentBuilder {
         private Long id;
         private String content;
         private Post post;
         private User user;
         private LocalDateTime createdAt;
+
         CommentBuilder() {
         }
 
@@ -71,72 +74,94 @@ public class Comment {
             this.createdAt = createdAt;
             return this;
         }
+
         public Comment build() {
             return new Comment(this.id, this.content, this.post, this.user, this.createdAt);
         }
 
         @java.lang.Override
         public java.lang.String toString() {
-            return "Comment.CommentBuilder(id=" + this.id + ", content=" + this.content + ", post=" + this.post + ", user=" + this.user + ", createdAt=" + this.createdAt + ")";
+            return "Comment.CommentBuilder(id=" + this.id + ", content=" + this.content + ", post=" + this.post
+                    + ", user=" + this.user + ", createdAt=" + this.createdAt + ")";
         }
     }
+
     public static Comment.CommentBuilder builder() {
         return new Comment.CommentBuilder();
     }
+
     public Long getId() {
         return this.id;
     }
+
     public String getContent() {
         return this.content;
     }
+
     public Post getPost() {
         return this.post;
     }
+
     public User getUser() {
         return this.user;
     }
+
     public LocalDateTime getCreatedAt() {
         return this.createdAt;
     }
+
     public void setId(final Long id) {
         this.id = id;
     }
+
     public void setContent(final String content) {
         this.content = content;
     }
+
     public void setPost(final Post post) {
         this.post = post;
     }
+
     public void setUser(final User user) {
         this.user = user;
     }
+
     public void setCreatedAt(final LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
     @java.lang.Override
     public boolean equals(final java.lang.Object o) {
-        if (o == this) return true;
-        if (!(o instanceof Comment)) return false;
+        if (o == this)
+            return true;
+        if (!(o instanceof Comment))
+            return false;
         final Comment other = (Comment) o;
-        if (!other.canEqual((java.lang.Object) this)) return false;
+        if (!other.canEqual((java.lang.Object) this))
+            return false;
         final java.lang.Object this$id = this.getId();
         final java.lang.Object other$id = other.getId();
-        if (this$id == null ? other$id != null : !this$id.equals(other$id)) return false;
+        if (this$id == null ? other$id != null : !this$id.equals(other$id))
+            return false;
         final java.lang.Object this$content = this.getContent();
         final java.lang.Object other$content = other.getContent();
-        if (this$content == null ? other$content != null : !this$content.equals(other$content)) return false;
+        if (this$content == null ? other$content != null : !this$content.equals(other$content))
+            return false;
         final java.lang.Object this$post = this.getPost();
         final java.lang.Object other$post = other.getPost();
-        if (this$post == null ? other$post != null : !this$post.equals(other$post)) return false;
+        if (this$post == null ? other$post != null : !this$post.equals(other$post))
+            return false;
         final java.lang.Object this$user = this.getUser();
         final java.lang.Object other$user = other.getUser();
-        if (this$user == null ? other$user != null : !this$user.equals(other$user)) return false;
+        if (this$user == null ? other$user != null : !this$user.equals(other$user))
+            return false;
         final java.lang.Object this$createdAt = this.getCreatedAt();
         final java.lang.Object other$createdAt = other.getCreatedAt();
-        if (this$createdAt == null ? other$createdAt != null : !this$createdAt.equals(other$createdAt)) return false;
+        if (this$createdAt == null ? other$createdAt != null : !this$createdAt.equals(other$createdAt))
+            return false;
         return true;
     }
+
     protected boolean canEqual(final java.lang.Object other) {
         return other instanceof Comment;
     }
@@ -160,11 +185,15 @@ public class Comment {
 
     @java.lang.Override
     public java.lang.String toString() {
-        return "Comment(id=" + this.getId() + ", content=" + this.getContent() + ", post=" + this.getPost() + ", user=" + this.getUser() + ", createdAt=" + this.getCreatedAt() + ")";
+        return "Comment(id=" + this.getId() + ", content=" + this.getContent() + ", post=" + this.getPost() + ", user="
+                + this.getUser() + ", createdAt=" + this.getCreatedAt() + ")";
     }
+
     public Comment() {
     }
-    public Comment(final Long id, final String content, final Post post, final User user, final LocalDateTime createdAt) {
+
+    public Comment(final Long id, final String content, final Post post, final User user,
+            final LocalDateTime createdAt) {
         this.id = id;
         this.content = content;
         this.post = post;

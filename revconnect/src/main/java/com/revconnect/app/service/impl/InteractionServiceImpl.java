@@ -44,7 +44,7 @@ public class InteractionServiceImpl implements InteractionService {
     }
 
     @Override
-    public void toggleLike(Long postId, String username) {
+    public long toggleLike(Long postId, String username) {
         Post post = postRepository.findById(postId).orElseThrow();
         User user = userRepository.findByUsername(username).orElseThrow();
         if (likeRepository.existsByPostAndUser(post, user)) {
@@ -56,17 +56,20 @@ public class InteractionServiceImpl implements InteractionService {
                         user.getUsername() + " liked your post");
             }
         }
+        likeRepository.flush();
+        return likeRepository.countByPost(post);
     }
 
     @Override
-    public void addComment(Long postId, String username, String content) {
+    public Comment addComment(Long postId, String username, String content) {
         Post post = postRepository.findById(postId).orElseThrow();
         User user = userRepository.findByUsername(username).orElseThrow();
-        commentRepository.save(Comment.builder().post(post).user(user).content(content).build());
+        Comment comment = commentRepository.save(Comment.builder().post(post).user(user).content(content).build());
         if (!post.getAuthor().equals(user)) {
             notificationService.createNotification(post.getAuthor(), NotificationType.COMMENT, postId,
                     user.getUsername() + " commented on your post: " + content);
         }
+        return comment;
     }
 
     @Override
@@ -91,11 +94,14 @@ public class InteractionServiceImpl implements InteractionService {
         if (!shareRepository.existsByPostAndUser(originalPost, user)) {
             shareRepository.save(Share.builder().post(originalPost).user(user).build());
 
+            // Increment shares count
+            originalPost.setSharesCount(originalPost.getSharesCount() + 1);
+            postRepository.save(originalPost);
+
             // Create a new post as a "repost"
             Post sharedPost = Post.builder()
                     .author(user)
-                    .content("") // Reposts can have empty content if it's just a share, or we can add a comment
-                                 // field later
+                    .content("") // Reposts can have empty content if it's just a share
                     .parentPost(originalPost)
                     .isPublished(true)
                     .build();
@@ -122,6 +128,16 @@ public class InteractionServiceImpl implements InteractionService {
         User user = userRepository.findByUsername(username).orElseThrow();
         if (!postViewStatsRepository.existsByPostAndViewer(post, user)) {
             postViewStatsRepository.save(new PostViewStats(post, user));
+
+            // Increment reach count
+            post.setReachCount(post.getReachCount() + 1);
+            postRepository.save(post);
         }
+    }
+
+    @Override
+    public long countCommentsByPost(Long postId) {
+        Post post = postRepository.findById(postId).orElseThrow();
+        return commentRepository.countByPost(post);
     }
 }

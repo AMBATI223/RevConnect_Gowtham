@@ -4,9 +4,9 @@ import com.revconnect.app.entity.Comment;
 import java.util.List;
 
 public interface InteractionService {
-    void toggleLike(Long postId, String username);
+    long toggleLike(Long postId, String username);
 
-    void addComment(Long postId, String username, String content);
+    Comment addComment(Long postId, String username, String content);
 
     void deleteComment(Long commentId, String username);
 
@@ -15,4 +15,6 @@ public interface InteractionService {
     List<Comment> getCommentsForPost(Long postId);
 
     void trackView(Long postId, String username);
+
+    long countCommentsByPost(Long postId);
 }

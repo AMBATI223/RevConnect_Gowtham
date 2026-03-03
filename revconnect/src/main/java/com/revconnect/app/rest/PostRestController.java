@@ -47,10 +47,11 @@ public class PostRestController {
             @RequestParam(required = false) String ctaLink,
             @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime scheduledFor,
             @RequestParam(required = false, defaultValue = "false") boolean isPinned,
-            @RequestParam(required = false, defaultValue = "false") boolean isPromotional) {
+            @RequestParam(required = false, defaultValue = "false") boolean isPromotional,
+            @RequestParam(required = false) Long taggedProductId) {
         postService.createPost(userDetails.getUsername(), content, hashtags, image, ctaLabel, ctaLink, scheduledFor,
-                isPinned, isPromotional);
-        return ResponseEntity.ok().build(); // Assuming createPost manages its internal void return currently.
+                isPinned, isPromotional, taggedProductId);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}")
@@ -60,11 +61,12 @@ public class PostRestController {
             @RequestParam(required = false) String ctaLink,
             @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime scheduledFor,
             @RequestParam(required = false, defaultValue = "false") boolean isPinned,
-            @RequestParam(required = false, defaultValue = "false") boolean isPromotional) {
+            @RequestParam(required = false, defaultValue = "false") boolean isPromotional,
+            @RequestParam(required = false) Long taggedProductId) {
         if (userDetails == null)
             return ResponseEntity.status(401).build();
         postService.updatePost(id, userDetails.getUsername(), content, hashtags, ctaLabel, ctaLink, scheduledFor,
-                isPinned, isPromotional);
+                isPinned, isPromotional, taggedProductId);
         return ResponseEntity.ok().build();
     }
 

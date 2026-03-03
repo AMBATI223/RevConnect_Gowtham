@@ -1,7 +1,6 @@
 package com.revconnect.app.controller;
 
 import com.revconnect.app.repository.PostRepository;
-import com.revconnect.app.repository.PostViewStatsRepository;
 import com.revconnect.app.repository.UserRepository;
 import com.revconnect.app.entity.Post;
 import com.revconnect.app.entity.User;
@@ -21,14 +20,12 @@ public class AnalyticsController {
 
     private final UserRepository userRepository;
     private final PostRepository postRepository;
-    private final PostViewStatsRepository postViewStatsRepository;
     private final NetworkService networkService;
 
     public AnalyticsController(UserRepository userRepository, PostRepository postRepository,
-            PostViewStatsRepository postViewStatsRepository, NetworkService networkService) {
+            NetworkService networkService) {
         this.userRepository = userRepository;
         this.postRepository = postRepository;
-        this.postViewStatsRepository = postViewStatsRepository;
         this.networkService = networkService;
     }
 
@@ -47,26 +44,50 @@ public class AnalyticsController {
         long totalViews = 0;
         long totalLikes = 0;
         long totalComments = 0;
+        long totalShares = 0;
         Map<Long, Long> postViews = new HashMap<>();
 
         for (Post post : userPosts) {
-            long views = postViewStatsRepository.countByPost(post);
-            postViews.put(post.getId(), views);
-
-            totalViews += views;
+            postViews.put(post.getId(), (long) post.getReachCount());
+            totalViews += post.getReachCount();
             totalLikes += post.getLikesCount();
             totalComments += post.getCommentsCount();
+            totalShares += post.getSharesCount();
         }
 
-        long totalFollowers = networkService.getFollowers(user.getUsername()).size();
+        List<User> followers = networkService.getFollowers(user.getUsername());
+        long totalFollowers = followers.size();
+
+        Map<String, Long> locationDemographics = new HashMap<>();
+        Map<String, Long> industryDemographics = new HashMap<>();
+
+        for (User follower : followers) {
+            // Location demographics
+            String location = follower.getLocation();
+            if (location == null || location.trim().isEmpty()) {
+                location = "Unknown";
+            }
+            locationDemographics.put(location, locationDemographics.getOrDefault(location, 0L) + 1);
+
+            // Industry demographics (if follower has business profile)
+            if (follower.getBusinessProfile() != null) {
+                String industry = follower.getBusinessProfile().getCategory();
+                if (industry != null && !industry.trim().isEmpty()) {
+                    industryDemographics.put(industry, industryDemographics.getOrDefault(industry, 0L) + 1);
+                }
+            }
+        }
 
         model.addAttribute("totalViews", totalViews);
         model.addAttribute("totalLikes", totalLikes);
         model.addAttribute("totalComments", totalComments);
-        model.addAttribute("totalEngagement", totalLikes + totalComments);
+        model.addAttribute("totalShares", totalShares);
+        model.addAttribute("totalEngagement", totalLikes + totalComments + totalShares);
         model.addAttribute("totalFollowers", totalFollowers);
         model.addAttribute("posts", userPosts);
         model.addAttribute("postViews", postViews);
+        model.addAttribute("locationDemographics", locationDemographics);
+        model.addAttribute("industryDemographics", industryDemographics);
 
         return "analytics";
     }

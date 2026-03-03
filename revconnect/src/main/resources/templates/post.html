@@ -136,7 +136,7 @@
                     </form>
 
                     <button class="action-btn" style="font-size: 1.1em; cursor: default;">
-                        💬 <span th:text="${post.commentsCount}">0</span> Comments
+                        💬 <span th:id="'comment-count-' + ${post.id}" th:text="${post.commentsCount}">0</span> Comments
                     </button>
 
                     <!-- Share Button -->
@@ -151,7 +151,7 @@
                     <button th:if="${currentUsername != null and currentUsername == post.author.username}" type="button"
                         data-bs-toggle="modal" th:data-bs-target="'#editPostModal-' + ${post.id}"
                         class="btn btn-link text-primary fs-6 p-0 text-decoration-none" style="margin-left:auto;">
-                        ✏️ Edit
+                        ️🖍 Edit
                     </button>
 
                     <!-- Delete Post Form -->
@@ -159,7 +159,7 @@
                         th:action="@{/posts/{id}/delete(id=${post.id})}" method="post" style="margin: 0;"
                         onsubmit="return confirm('Are you sure you want to delete this post?');">
                         <button type="submit" class="btn btn-link text-danger fs-6 p-0 text-decoration-none">
-                            🗑️ Delete
+                            🗑 ️ Delete
                         </button>
                     </form>
 
@@ -192,6 +192,41 @@
                                     <input type="text" class="form-control" name="hashtags" th:value="${post.hashtags}"
                                         placeholder="Hashtags">
                                 </div>
+                                <div th:if="${currentUser != null and (currentUser.role.name() == 'BUSINESS' or currentUser.role.name() == 'CREATOR')}"
+                                    class="border-top pt-3 mt-3">
+                                    <h6 class="fw-bold mb-3">Business Tools</h6>
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" name="isPromotional"
+                                            id="isPromotionalEdit" th:checked="${post.isPromotional}">
+                                        <label class="form-check-label" for="isPromotionalEdit">Mark as
+                                            Promotional</label>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">CTA Label</label>
+                                        <input type="text" class="form-control form-control-sm" name="ctaLabel"
+                                            th:value="${post.ctaLabel}" placeholder="e.g. Shop Now">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">CTA Link</label>
+                                        <input type="url" class="form-control form-control-sm" name="ctaLink"
+                                            th:value="${post.ctaLink}" placeholder="https://...">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Schedule For</label>
+                                        <input type="datetime-local" class="form-control form-control-sm"
+                                            name="scheduledFor" th:value="${post.scheduledFor}">
+                                    </div>
+                                    <div class="mb-3" th:if="${products != null and !products.empty}">
+                                        <label class="form-label small fw-bold">Tag a Product</label>
+                                        <select name="taggedProductId" class="form-select form-select-sm">
+                                            <option value="">None</option>
+                                            <option th:each="prod : ${products}" th:value="${prod.id}"
+                                                th:text="${prod.name}"
+                                                th:selected="${post.taggedProduct != null and post.taggedProduct.id == prod.id}">
+                                                Product Name</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -213,40 +248,42 @@
             <!-- Comments List -->
             <div>
                 <h4 style="margin-bottom: 15px;">Comments</h4>
-                <div th:if="${comments == null or comments.empty}"
-                    style="color: gray; text-align: center; padding: 20px;">
-                    No comments yet. Be the first to start the conversation!
-                </div>
+                <div th:id="'commentsList-' + ${post.id}">
+                    <div th:if="${comments == null or comments.empty}"
+                        style="color: gray; text-align: center; padding: 20px;">
+                        No comments yet. Be the first to start the conversation!
+                    </div>
 
-                <div th:if="${comments != null and !comments.empty}">
-                    <div th:each="comment : ${comments}"
-                        style="display: flex; margin-bottom: 20px; align-items: flex-start;">
-                        <img th:src="${comment.user.profilePictureUrl != null ? comment.user.profilePictureUrl : 'https://via.placeholder.com/35'}"
-                            style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; margin-right: 12px; margin-top: 5px;">
-                        <div
-                            style="background: #f1f0f0; padding: 12px 15px; border-radius: 15px; flex-grow: 1; max-width: fit-content;">
-                            <div style="margin-bottom: 5px;">
-                                <a th:href="@{/users/profile/{username}(username=${comment.user.username})}"
-                                    style="text-decoration: none; color: black; font-weight: bold; margin-right: 10px;"
-                                    th:text="${comment.user.username}">Username</a>
-                                <small style="color: gray;"
-                                    th:text="${#temporals.format(comment.createdAt, 'dd MMM HH:mm')}">Date</small>
+                    <div th:if="${comments != null and !comments.empty}">
+                        <div th:each="comment : ${comments}"
+                            style="display: flex; margin-bottom: 20px; align-items: flex-start;">
+                            <img th:src="${comment.user.profilePictureUrl != null ? comment.user.profilePictureUrl : 'https://via.placeholder.com/35'}"
+                                style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; margin-right: 12px; margin-top: 5px;">
+                            <div
+                                style="background: #f1f0f0; padding: 12px 15px; border-radius: 15px; flex-grow: 1; max-width: fit-content;">
+                                <div style="margin-bottom: 5px;">
+                                    <a th:href="@{/users/profile/{username}(username=${comment.user.username})}"
+                                        style="text-decoration: none; color: black; font-weight: bold; margin-right: 10px;"
+                                        th:text="${comment.user.username}">Username</a>
+                                    <small style="color: gray;"
+                                        th:text="${#temporals.format(comment.createdAt, 'dd MMM HH:mm')}">Date</small>
+                                </div>
+                                <p th:text="${comment.content}" style="margin: 0; line-height: 1.4;"></p>
+                                <form th:if="${currentUsername != null and currentUsername == comment.user.username}"
+                                    th:action="@{/interactions/comment/{id}/delete(id=${comment.id})}" method="post"
+                                    style="margin-top: 8px;">
+                                    <input type="hidden" name="postId" th:value="${post.id}" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger"
+                                        style="padding: 2px 8px; font-size: 0.85em;">Delete</button>
+                                </form>
                             </div>
-                            <p th:text="${comment.content}" style="margin: 0; line-height: 1.4;"></p>
-                            <form th:if="${currentUsername != null and currentUsername == comment.user.username}"
-                                th:action="@{/interactions/comment/{id}/delete(id=${comment.id})}" method="post"
-                                style="margin-top: 8px;">
-                                <input type="hidden" name="postId" th:value="${post.id}" />
-                                <button type="submit" class="btn btn-sm btn-outline-danger"
-                                    style="padding: 2px 8px; font-size: 0.85em;">Delete</button>
-                            </form>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script th:src="@{/js/app.js}"></script>
 </body>
 
 </html>
